@@ -1,9 +1,23 @@
-module Lib.Vector.Vec3 (Vec3 (..), x, y, z, r, g, b, makeUnitVector, dot, cross) where
+module Utils.Vector.Vec3 
+  ( Vec3(..)
+  , ivec3
+  , x, y, z
+  , r, g, b
+  , (!.)
+  , updateAt
+  , (+=), (-=), (*=), (//=)
+  , (*.), (/.)
+  , squaredLength
+  , vectorLength
+  , makeUnitVector
+  , dot
+  , cross
+  ) where
 
 newtype Vec3 = Vec3 { elements :: [Float] } deriving (Show, Eq)
 
-vec3 :: Float -> Float -> Float -> Vec3
-vec3 e0 e1 e2 = Vec3 [e0, e1, e2]
+ivec3 :: Float -> Float -> Float -> Vec3
+ivec3 e0 e1 e2 = Vec3 [e0, e1, e2]
 
 x :: Vec3 -> Float
 x (Vec3 e) = head e
@@ -48,8 +62,8 @@ a -= b = a - b
 (*=) :: Vec3 -> Vec3 -> Vec3
 a *= b = a * b
 
-(/=) :: Vec3 -> Vec3 -> Vec3
-(Vec3 a) /= (Vec3 b) = Vec3 [head a / head b, a !! 1 / b !! 1, a !! 2 / b !! 2]
+(//=) :: Vec3 -> Vec3 -> Vec3
+(Vec3 a) //= (Vec3 b) = Vec3 [head a / head b, a !! 1 / b !! 1, a !! 2 / b !! 2]
 
 (*.) :: Vec3 -> Float -> Vec3
 (Vec3 a) *. t = Vec3 [head a * t, a !! 1 * t, a !! 2 * t]
@@ -60,11 +74,11 @@ a *= b = a * b
 squaredLength :: Vec3 -> Float
 squaredLength (Vec3 e) = head e * head e + e !! 1 * e !! 1 + e !! 2 * e !! 2
 
-length :: Vec3 -> Float
-length v = sqrt (squaredLength v)
+vectorLength :: Vec3 -> Float
+vectorLength v = sqrt (squaredLength v)
 
 makeUnitVector :: Vec3 -> Vec3
-makeUnitVector v = v /. Lib.Vector.Vec3.length v
+makeUnitVector v = v /. vectorLength v
 
 dot :: Vec3 -> Vec3 -> Float
 dot (Vec3 a) (Vec3 b) = head a * head b + a !! 1 * b !! 1 + a !! 2 * b !! 2
