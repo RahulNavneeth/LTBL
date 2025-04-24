@@ -1,4 +1,5 @@
 import Data.List (intercalate)
+import Lib.Vector.Vec3 
 
 type Pixel = Int
 newtype RGB = RGB (Int, Int, Int) deriving Show
@@ -10,10 +11,10 @@ data Dimension = Dimension {
 } deriving Show
 
 sceneWidth :: Pixel
-sceneWidth = 1920 
+sceneWidth = 200 
 
 sceneHeight :: Pixel
-sceneHeight = 1080
+sceneHeight = 100
 
 dimension :: Dimension
 dimension = Dimension sceneWidth sceneHeight
