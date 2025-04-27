@@ -2,6 +2,9 @@ import Data.List (intercalate)
 import Utils.Vector.Vec3
 import Utils.Geo.Ray
 import Utils.Geo.Sphere
+import Utils.Geo.Common
+-- TODO: Make sure not to import everything everytime
+import Utils.Geo.Hittable (HitData(..))
 import System.IO
 
 type Pixel = Int
@@ -39,17 +42,22 @@ writeAsPPM scene = withFile outputPath WriteMode $ \handle -> do
 
 getColor :: Ray -> Int -> Int -> Float -> Float -> Vec3
 getColor ray i j u v
-           | t >= 0.0 = ivec3 (x n + 1) (y n + 1) (z n + 1) *. 0.5
-           | even (i + j) = ivec3 0.0 0.0 1.0
-           | otherwise = smoothStep
-           where
-               sc = ivec3 0.0 0.0 (-1.0)
-               (t, n) = hitSphere (Sphere 0.5 sc) ray
+    | not (null xs) && t0 >= 0.0 = ivec3 (x n + 1) (y n + 1) (z n + 1) *. 0.5
+    | even (i + j) = ivec3 0.0 0.0 1.0
+    | otherwise = smoothStep
+    where
+        sc = ivec3 0.0 0.0 (-1.0)
+        xs = hitDoesIt ray [
+                SphereObject $ Sphere 0.5 (ivec3 0.0 0.0 (-1.0)),
+                SphereObject $ Sphere 100.0 (ivec3 0.0 (-100.5) (-1.0))
+                ]
+        t0 = t (head xs)
+        n = normal (head xs)
 
-               unit_direction = makeUnitVector $ direction ray
-               lerp1 = (ivec3 0.0 0.0 1.0 *. u) + (ivec3 0.0 1.0 0.0 *. (1.0 - u))
-               lerp2 = (ivec3 0.0 0.0 0.0 *. u) + (ivec3 1.0 0.0 1.0 *. (1.0 - u))
-               smoothStep = (lerp1 *. v) + (lerp2 *. (1.0 - v))
+        unit_direction = makeUnitVector $ direction ray
+        lerp1 = (ivec3 0.0 0.0 1.0 *. u) + (ivec3 0.0 1.0 0.0 *. (1.0 - u))
+        lerp2 = (ivec3 0.0 0.0 0.0 *. u) + (ivec3 1.0 0.0 1.0 *. (1.0 - u))
+        smoothStep = (lerp1 *. v) + (lerp2 *. (1.0 - v))
 
 generateScene :: Scene
 generateScene =
