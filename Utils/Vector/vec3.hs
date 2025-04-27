@@ -6,7 +6,7 @@ module Utils.Vector.Vec3
   , (!.)
   , updateAt
   , (+=), (-=), (*=), (//=)
-  , (*.), (/.)
+  , (+.), (-.), (*.), (/.)
   , squaredLength
   , vectorLength
   , makeUnitVector
@@ -65,11 +65,20 @@ a *= b = a * b
 (//=) :: Vec3 -> Vec3 -> Vec3
 (Vec3 a) //= (Vec3 b) = Vec3 [head a / head b, a !! 1 / b !! 1, a !! 2 / b !! 2]
 
+infixl 6 +., -.
+infixl 7 *., /.
+
+(+.) :: Vec3 -> Float -> Vec3
+(Vec3 [x, y, z]) +. t = Vec3 [x + t, y + t, z + t]
+
+(-.) :: Vec3 -> Float -> Vec3
+(Vec3 [x, y, z]) -. t = Vec3 [x - t, y - t, z - t]
+
 (*.) :: Vec3 -> Float -> Vec3
-(Vec3 a) *. t = Vec3 [head a * t, a !! 1 * t, a !! 2 * t]
+(Vec3 [x, y, z]) *. t = Vec3 [x * t, y * t, z * t]
 
 (/.) :: Vec3 -> Float -> Vec3
-(Vec3 a) /. t = Vec3 [head a / t, a !! 1 / t, a !! 2 / t]
+(Vec3 [x, y, z]) /. t = Vec3 [x / t, y / t, z / t]
 
 squaredLength :: Vec3 -> Float
 squaredLength (Vec3 e) = head e * head e + e !! 1 * e !! 1 + e !! 2 * e !! 2

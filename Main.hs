@@ -2,6 +2,7 @@ import Data.List (intercalate)
 import Utils.Vector.Vec3
 import Utils.Geo.Ray
 import Utils.Geo.Sphere
+import System.IO
 
 type Pixel = Int
 newtype RGB = RGB (Int, Int, Int) deriving Show
@@ -27,35 +28,28 @@ outputPath = "./scene.ppm"
 getIndex :: Int -> Int -> Int
 getIndex i j = i * width dimension + j
 
-writeAsPMM :: Scene -> IO ()
-writeAsPMM scene = writeFile outputPath $
-                             "P3\n"
-                             ++ dimension_string
-                             ++ "\n255\n" 
-                             ++ intercalate "\n" (map value scene)
-                                where
-                                    value (RGB (a, b, c)) = unwords (map show [a, b, c])
-                                    dimension_string = unwords (map show [width dimension, height dimension])
-
-
-hitSphere :: Sphere -> Ray -> Bool 
-hitSphere s r = rad - y * y > 0
-                where
-                    t = dot (position s - origin r) (direction r)
-                    p = pointAtT r t
-                    y = vectorLength (position s - p)
-                    rad = radius s ** radius s
+writeAsPPM :: Scene -> IO ()
+writeAsPPM scene = withFile outputPath WriteMode $ \handle -> do
+    hPutStrLn handle "P3"
+    hPutStrLn handle (unwords [show $ width dimension, show $ height dimension])
+    hPutStrLn handle "255"
+    mapM_ (hPutStrLn handle . value) scene
+  where
+    value (RGB (r, g, b)) = unwords (map show [r, g, b])
 
 getColor :: Ray -> Int -> Int -> Float -> Float -> Vec3
 getColor ray i j u v
-           | hitSphere (Sphere 0.5 $ ivec3 0.0 0.0 1.0) ray = ivec3 1.0 0.0 0.0
+           | t >= 0.0 = ivec3 (x n + 1) (y n + 1) (z n + 1) *. 0.5
+           | even (i + j) = ivec3 0.0 0.0 1.0
            | otherwise = smoothStep
            where
+               sc = ivec3 0.0 0.0 (-1.0)
+               (t, n) = hitSphere (Sphere 0.5 sc) ray
+
                unit_direction = makeUnitVector $ direction ray
                lerp1 = (ivec3 0.0 0.0 1.0 *. u) + (ivec3 0.0 1.0 0.0 *. (1.0 - u))
                lerp2 = (ivec3 0.0 0.0 0.0 *. u) + (ivec3 1.0 0.0 1.0 *. (1.0 - u))
                smoothStep = (lerp1 *. v) + (lerp2 *. (1.0 - v))
-               t = 0.5 * (y unit_direction + 1.0)
 
 generateScene :: Scene
 generateScene =
@@ -77,4 +71,4 @@ generateScene =
 
 main :: IO ()
 main = 
-    writeAsPMM generateScene
+    writeAsPPM generateScene
