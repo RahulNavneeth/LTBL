@@ -1,0 +1,48 @@
+cabal-version:      3.0
+name:               LTBL
+version:            0.1.0.0
+-- synopsis:
+-- description:
+license:            BSD-3-Clause
+license-file:       LICENSE
+author:             RahulNavneeth
+maintainer:         rahulmnavneeth@gmail.com
+-- copyright:
+category:           Graphics
+build-type:         Simple
+-- extra-source-files:
+
+common warnings
+  ghc-options:
+    -Wall
+    -Wname-shadowing
+    -Wno-missing-home-modules
+
+library
+  import: warnings
+  exposed-modules: LTBL
+  other-modules:
+      Utils.Functions.DRand
+      Utils.Geo.Box
+      Utils.Geo.Common
+      Utils.Geo.Hittable
+      Utils.Geo.Ray
+      Utils.Geo.Sphere
+      Utils.Scene.Camera
+      Utils.Vector.Vec3
+  hs-source-dirs: src
+  build-depends: base >=4.17.2.1 && <4.19,
+                 vector,
+  default-extensions: InstanceSigs
+  default-language: Haskell2010
+
+executable LTBL
+    import:           warnings
+    main-is:          Main.hs
+    -- other-modules:
+    -- other-extensions:
+    build-depends: base >=4.17.2.1 && <4.19,
+                      vector,
+                      LTBL
+    hs-source-dirs:   app
+    default-language: Haskell2010
