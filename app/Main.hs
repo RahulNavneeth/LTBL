@@ -1,3 +1,5 @@
+{-# LANGUAGE BangPatterns #-}
+
 import qualified Data.Vector as V
 import qualified Data.Vector.Unboxed as VU
 import LTBL
@@ -53,9 +55,9 @@ writeAsPPM scene = withFile outputPath WriteMode $ \handle -> do
 
 getColor :: Ray -> Int -> Int -> Float -> Float -> Int -> Vec3
 getColor ray i j u v depth
-  -- \| depth < 0 = ivec3 1.0 0.0 0.0
+  | depth < 0 = ivec3 1.0 0.0 0.0
   | t xs > 0.0 && depth > 0 = getColor (iray (p xs) (target - p xs)) i j u v (depth - 1) *. 0.5
-  -- \| even (i + j) = ivec3 0.0 0.0 1.0
+  | even (i + j) = ivec3 0.0 0.0 1.0
   | otherwise = sky
   where
     xs = hitDoesIt ray world

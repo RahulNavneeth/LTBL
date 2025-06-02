@@ -99,7 +99,7 @@ squaredLength :: Vec3 -> Float
 squaredLength (Vec3 e) = VU.foldl' (\acc i -> acc + i * i) 0 e
 
 vectorLength :: Vec3 -> Float
-vectorLength v = sqrt (squaredLength v)
+vectorLength v = sqrt $ squaredLength v
 
 makeUnitVector :: Vec3 -> Vec3
 makeUnitVector v = v /. vectorLength v
