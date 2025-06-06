@@ -1,19 +1,17 @@
-module Utils.Geo.Box
-  ( Box (..),
+module Rel.MeshRel.Box.Hit (
+	Box (..),
     Hittable (hit),
     iBox,
-  )
-where
+) where
 
-import Utils.Geo.Hittable (HitData, Hittable (hit), iHitData)
-import Utils.Geo.Ray (Ray)
-import Utils.Vector.Vec3
+import Rel.MeshRel.IHit.Base (HitData, Hittable (hit), iHitData)
+import Struct.Ray (Ray)
+import Struct.Vector.Vec3
 
-data Box = Box
-  { vmin :: Vec3,
+data Box = Box {
+	vmin :: Vec3,
     vmax :: Vec3
-  }
-  deriving (Show)
+} deriving (Show)
 
 iBox :: Vec3 -> Vec3 -> Box
 iBox = Box

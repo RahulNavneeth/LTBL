@@ -1,11 +1,13 @@
-module Utils.Geo.Common (Object (..), hitDoesIt) where
+module Rel.MeshRel.IHit.Hittable (Object (..), hitDoesIt) where
 
 import qualified Data.Vector as V
-import Utils.Geo.Box
-import Utils.Geo.Hittable (HitData (..), iHitData)
-import Utils.Geo.Ray (Ray)
-import Utils.Geo.Sphere
-import Utils.Vector.Vec3
+import Rel.MeshRel.IHit.Base (HitData (..), iHitData)
+import Struct.Ray (Ray)
+import Rel.MeshRel.Sphere.Hit
+import Rel.MeshRel.Box.Hit
+import Struct.Vector.Vec3
+
+import SceneDescriptor.Attribute.Mesh.Primitive.Sphere (Sphere)
 
 data Object = SphereObject Sphere | BoxObject Box
 

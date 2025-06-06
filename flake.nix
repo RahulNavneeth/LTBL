@@ -15,11 +15,8 @@
 					buildInputs = with pkgs; [
 						ghc
 						cabal-install
+						clang
 					];
-					shellHook = ''
-						cabal update
-						cabal build
-					'';
 				};
 			});
 }

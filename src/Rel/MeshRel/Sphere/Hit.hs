@@ -1,34 +1,10 @@
-module Utils.Geo.Sphere
-  ( Sphere (..),
-    Hittable (hit),
-    isphereWithRad,
-    isphereWithPos,
-    isphere,
-    isphereDefault,
-  )
-where
+module Rel.MeshRel.Sphere.Hit (Hittable (hit)) where
 
-import Utils.Geo.Hittable
-import Utils.Geo.Ray
-import Utils.Vector.Vec3
+import Rel.MeshRel.IHit.Base
+import Struct.Ray
+import Struct.Vector.Vec3
 
-data Sphere = Sphere
-  { radius :: Float,
-    position :: Vec3
-  }
-  deriving (Show)
-
-isphereWithRad :: Float -> Sphere
-isphereWithRad rad = Sphere rad (ivec3 0.0 0.0 0.0)
-
-isphereWithPos :: Vec3 -> Sphere
-isphereWithPos = Sphere 1.0
-
-isphere :: Float -> Vec3 -> Sphere
-isphere = Sphere
-
-isphereDefault :: Sphere
-isphereDefault = Sphere 1.0 (ivec3 0.0 0.0 0.0)
+import SceneDescriptor.Attribute.Mesh.Primitive.Sphere (Sphere (..))
 
 instance Hittable Sphere where
   hit :: Sphere -> Ray -> HitData

@@ -1,14 +1,13 @@
-module Utils.Geo.Ray
-  ( Ray (..),
+module Struct.Ray (
+	Ray (..),
     iray,
     origin,
     direction,
     pointAtT,
-  )
-where
+) where
 
 import qualified Data.Vector as V
-import Utils.Vector.Vec3
+import Struct.Vector.Vec3
 
 newtype Ray = Ray {ray_elements :: V.Vector Vec3} deriving (Show, Eq)
 

@@ -1,5 +1,5 @@
-module Utils.Vector.Vec3
-  ( Vec3 (..),
+module Struct.Vector.Vec3 (
+	Vec3 (..),
     ivec3,
     x,
     y,
@@ -22,8 +22,7 @@ module Utils.Vector.Vec3
     makeUnitVector,
     dot,
     cross,
-  )
-where
+) where
 
 import Data.Vector.Unboxed (Vector, (!), (//))
 import qualified Data.Vector.Unboxed as VU

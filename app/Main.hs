@@ -11,12 +11,11 @@ newtype RGB = RGB (Int, Int, Int) deriving (Show)
 
 type Scene = [RGB]
 
-data Dimension = Dimension
-  { width :: Pixel,
+data Dimension = Dimension {
+	width :: Pixel,
     height :: Pixel,
     samples :: Pixel
-  }
-  deriving (Show)
+} deriving (Show)
 
 sceneWidth :: Pixel
 sceneWidth = 200
@@ -25,7 +24,7 @@ sceneHeight :: Pixel
 sceneHeight = 100
 
 sceneSamples :: Pixel
-sceneSamples = 10
+sceneSamples = 100
 
 dimension :: Dimension
 dimension = Dimension sceneWidth sceneHeight sceneSamples
@@ -53,63 +52,56 @@ writeAsPPM scene = withFile outputPath WriteMode $ \handle -> do
   where
     value (RGB (r, g, b)) = unwords (map show [r, g, b])
 
-getColor :: Ray -> Int -> Int -> Float -> Float -> Int -> Vec3
-getColor ray i j u v depth
-  | depth < 0 = ivec3 1.0 0.0 0.0
-  | t xs > 0.0 && depth > 0 = getColor (iray (p xs) (target - p xs)) i j u v (depth - 1) *. 0.5
-  | even (i + j) = ivec3 0.0 0.0 1.0
-  | otherwise = sky
+getScenePixel :: Ray -> Int -> Int -> Float -> Float -> Int -> IO Vec3
+getScenePixel ray i j u v depth = do
+  s <- randomInUnitSphere
+  let xs = hitDoesIt ray world
+      target = p xs + normal xs + s
+      unit_direction = makeUnitVector $ direction ray
+      t' = 0.5 * (y unit_direction + 1.0)
+      sky = ivec3 1.0 1.0 1.0 *. (1 - t') + ivec3 0.5 0.7 1.0 *. t'
+      -- lerp1 = (ivec3 0.0 0.0 0.0 *. u) + (ivec3 1.0 0.0 1.0 *. (1.0 - u))
+      -- lerp2 = (ivec3 0.0 0.0 1.0 *. u) + (ivec3 0.0 1.0 0.0 *. (1.0 - u))
+      -- smoothStep = (lerp1 *. v) + (lerp2 *. (1.0 - v))
+
+  if t xs > 0.0 && depth > 0 then do
+    color <- getScenePixel (iray (p xs) (target - p xs)) i j u v (depth - 1)
+    return (color *. 0.5)
+  -- else if even (i + j) then return (ivec3 0.0 0.0 1.0)
+  else return sky
+
+initScene :: IO Scene
+initScene = do
+  sequence
+    [ value i j
+      | i <- [height dimension - 1, height dimension - 2 .. 0],
+        j <- [0 .. width dimension - 1]
+    ]
   where
-    xs = hitDoesIt ray world
-    s = randomInUnitSphere 12345
-    target = p xs + normal xs + fst s
+    value :: Int -> Int -> IO RGB
+    value i j = do
+      col <- go 0 0
+      let ir = floor $ 255.9 * x col
+          ig = floor $ 255.9 * y col
+          ib = floor $ 255.9 * z col
 
-    unit_direction = makeUnitVector $ direction ray
-    t' = 0.5 * (y unit_direction + 1.0)
-    sky = ivec3 1.0 1.0 1.0 *. (1 - t') + ivec3 0.5 0.7 1.0 *. t'
-
--- lerp1 = (ivec3 0.0 0.0 0.0 *. u) + (ivec3 1.0 0.0 1.0 *. (1.0 - u))
--- lerp2 = (ivec3 0.0 0.0 1.0 *. u) + (ivec3 0.0 1.0 0.0 *. (1.0 - u))
--- smoothStep = (lerp1 *. v) + (lerp2 *. (1.0 - v))
-
-drandValue :: VU.Vector Float
-drandValue = generateRandoms 12345 $ width dimension * height dimension * samples dimension * 2
-
-generateScene :: Scene
-generateScene =
-  [ value i j
-    | i <- [height dimension - 1, height dimension - 2 .. 0],
-      j <- [0 .. width dimension - 1]
-  ]
-  where
-    value i j = RGB (ir, ig, ib)
+      return $ RGB (ir, ig, ib)
       where
-        origin = ivec3 0.0 0.0 0.0
-        lower_left_corner = ivec3 (-2.0) (-1.0) (-1.0)
-        horizontal = ivec3 4.0 0.0 0.0
-        vertical = ivec3 0.0 2.0 0.0
-
-        cam = icam origin lower_left_corner horizontal vertical
-
-        nSamples = samples dimension
-        baseIdx = getIndex i j * 2 * nSamples
-        totalColor = go 0 0
-          where
-            go acc s
-              | s == nSamples = acc
-              | otherwise =
-                  let uRand = drandValue VU.! (baseIdx + s * 2)
-                      vRand = drandValue VU.! (baseIdx + s * 2 + 1)
-                      u = (fromIntegral j + uRand) / fromIntegral (width dimension)
-                      v = (fromIntegral i + vRand) / fromIntegral (height dimension)
-                      r = getRay cam u v
-                      c = getColor r i j u v 50
-                   in go (acc + c) (s + 1)
-        col = totalColor /. fromIntegral nSamples
-
-        ir = floor $ 255.9 * x col
-        ig = floor $ 255.9 * y col
-        ib = floor $ 255.9 * z col
+          go acc s
+            | s == samples dimension = return (acc /. fromIntegral s)
+            | otherwise = do
+                uRand <- dRand
+                vRand <- dRand
+                let u = (fromIntegral j + uRand) / fromIntegral (width dimension)
+                    v = (fromIntegral i + vRand) / fromIntegral (height dimension)
+                    origin = ivec3 0.0 0.0 0.0
+                    lower_left_corner = ivec3 (-2.0) (-1.0) (-1.0)
+                    horizontal = ivec3 4.0 0.0 0.0
+                    vertical = ivec3 0.0 2.0 0.0
+                    cam = icam origin lower_left_corner horizontal vertical
+                    r = getRay cam u v
+                c <- getScenePixel r i j u v 50
+                go (acc + c) (s + 1)
 
 main :: IO ()
-main = writeAsPPM generateScene
+main = initScene >>= \scene -> writeAsPPM scene

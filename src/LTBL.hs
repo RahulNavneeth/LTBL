@@ -1,20 +1,31 @@
-module LTBL
-  ( module Utils.Functions.DRand,
-    module Utils.Geo.Box,
-    module Utils.Geo.Common,
-    module Utils.Geo.Hittable,
-    module Utils.Geo.Ray,
-    module Utils.Geo.Sphere,
-    module Utils.Scene.Camera,
-    module Utils.Vector.Vec3,
-  )
-where
+module LTBL (
+	module Rel.MeshRel.IHit.Base,
+	module Rel.MeshRel.IHit.Hittable,
+	module Struct.Vector.Vec3,
+	module Struct.Ray,
+	module SceneDescriptor.Parser,
+	module SceneDescriptor.Attribute.Camera.Base,
+	module SceneDescriptor.Attribute.Mesh.Primitive.Sphere,
+	module Cbits.Interface.DRand,
+) where
 
-import Utils.Functions.DRand
-import Utils.Geo.Box
-import Utils.Geo.Common
-import Utils.Geo.Hittable
-import Utils.Geo.Ray
-import Utils.Geo.Sphere
-import Utils.Scene.Camera
-import Utils.Vector.Vec3
+-- Rel
+-- # MeshRel :: Hit
+import Rel.MeshRel.IHit.Base
+import Rel.MeshRel.IHit.Hittable
+
+-- Struct
+-- # Vector
+import Struct.Vector.Vec3
+import Struct.Ray
+
+-- Scene descriptor
+-- # Parser
+import SceneDescriptor.Parser
+-- # Camera
+import SceneDescriptor.Attribute.Camera.Base
+-- # Attributes
+import SceneDescriptor.Attribute.Mesh.Primitive.Sphere
+
+-- Cbits
+import Cbits.Interface.DRand

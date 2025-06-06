@@ -1,19 +1,18 @@
-module Utils.Scene.Camera (
+module SceneDescriptor.Attribute.Camera.Base (
     Camera (..),
     CameraLike (getRay),
     icam,
-)
-where
+) where
 
-import Utils.Geo.Ray
-import Utils.Vector.Vec3
+import Struct.Ray
+import Struct.Vector.Vec3
 
-data Camera = Camera
-    { camOrigin :: Vec3
-    , lower_left_corner :: Vec3
-    , horizontal :: Vec3
-    , vertical :: Vec3
-    }
+data Camera = Camera {
+	camOrigin :: Vec3,
+	lower_left_corner :: Vec3,
+	horizontal :: Vec3,
+	vertical :: Vec3
+}
 
 icam :: Vec3 -> Vec3 -> Vec3 -> Vec3 -> Camera
 icam = Camera

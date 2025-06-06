@@ -18,21 +18,40 @@ common warnings
     -Wname-shadowing
     -Wno-missing-home-modules
 
+package *
+  ghc-options: -O0
+
 library
   import: warnings
   exposed-modules: LTBL
   other-modules:
-      Utils.Functions.DRand
-      Utils.Geo.Box
-      Utils.Geo.Common
-      Utils.Geo.Hittable
-      Utils.Geo.Ray
-      Utils.Geo.Sphere
-      Utils.Scene.Camera
-      Utils.Vector.Vec3
+    -- Rel
+    -- # MeshRel :: Hit
+    Rel.MeshRel.IHit.Base
+    Rel.MeshRel.IHit.Hittable
+    Rel.MeshRel.Box.Hit
+    Rel.MeshRel.Sphere.Hit
+    
+    -- Struct
+    -- # Vector
+    Struct.Vector.Vec3
+    Struct.Ray
+    
+    -- Scene descriptor
+    -- # Parser
+    SceneDescriptor.Parser
+    -- # Camera
+    SceneDescriptor.Attribute.Camera.Base
+    -- # Attributes
+    SceneDescriptor.Attribute.Mesh.Primitive.Sphere
+    
+    -- Cbits
+    Cbits.Interface.DRand
+
   hs-source-dirs: src
   build-depends: base >=4.17.2.1 && <4.21,
                  vector,
+                 filepath,
                  random,
   default-extensions: InstanceSigs
   default-language: Haskell2010
@@ -44,7 +63,6 @@ executable LTBL
     -- other-extensions:
     build-depends: base >=4.17.2.1 && <4.21,
                       vector,
-                      random,
                       LTBL
     hs-source-dirs:   app
     default-language: Haskell2010
