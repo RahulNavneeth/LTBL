@@ -14,7 +14,6 @@ foreign import ccall unsafe "stdlib.h drand48" c_drand :: IO CDouble
 dRand :: IO Float
 dRand = fmap realToFrac c_drand
 
--- Might wanna make it modular later
 randomInUnitSphere :: IO Vec3
 randomInUnitSphere = do
   x <- dRand

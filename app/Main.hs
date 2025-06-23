@@ -35,12 +35,12 @@ outputPath = "./scene.ppm"
 getIndex :: Int -> Int -> Int
 getIndex i j = i * width dimension + j
 
-world :: V.Vector Object
+world :: V.Vector Attribute
 world =
   V.fromList
-    [ SphereObject $ Sphere 100.0 (ivec3 0.0 (-100.5) (-1.0)),
-      SphereObject $ Sphere 0.5 (ivec3 0.0 0.0 (-1.0))
-      -- SphereObject $ Sphere 0.5 (ivec3 (-0.8) 0.0 (-1.4))
+    [ Attribute (SphereAttribute $ Sphere 100.0 (ivec3 0.0 (-100.5) (-1.0))) Diffuse,
+      Attribute (SphereAttribute $ Sphere 0.5 (ivec3 0.0 0.0 (-1.0))) Diffuse,
+      Attribute (SphereAttribute $ Sphere 0.5 (ivec3 (-0.8) 0.0 (-1.4))) Diffuse
     ]
 
 writeAsPPM :: Scene -> IO ()
@@ -54,8 +54,8 @@ writeAsPPM scene = withFile outputPath WriteMode $ \handle -> do
 
 getScenePixel :: Ray -> Int -> Int -> Float -> Float -> Int -> IO Vec3
 getScenePixel ray i j u v depth = do
-  s <- randomInUnitSphere
-  let xs = hitDoesIt ray world
+  let (xs, attribute) = hitDoesIt ray world
+  	  s <- (material attribute)
       target = p xs + normal xs + s
       unit_direction = makeUnitVector $ direction ray
       t' = 0.5 * (y unit_direction + 1.0)

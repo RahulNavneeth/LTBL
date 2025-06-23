@@ -31,6 +31,10 @@ library
     Rel.MeshRel.IHit.Hittable
     Rel.MeshRel.Box.Hit
     Rel.MeshRel.Sphere.Hit
+    -- # MaterialRel
+    Rel.MaterialRel.Base
+    Rel.MaterialRel.Lambertian
+    Rel.MaterialRel.Scatter
     
     -- Struct
     -- # Vector
@@ -43,6 +47,10 @@ library
     -- # Camera
     SceneDescriptor.Attribute.Camera.Base
     -- # Attributes
+    SceneDescriptor.Attribute.Base
+    SceneDescriptor.Attribute.Mesh.Base
+    SceneDescriptor.Attribute.Material.Base
+    SceneDescriptor.Attribute.Material.Lambertian
     SceneDescriptor.Attribute.Mesh.Primitive.Sphere
     
     -- Cbits

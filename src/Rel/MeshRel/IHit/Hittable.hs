@@ -1,26 +1,27 @@
-module Rel.MeshRel.IHit.Hittable (Object (..), hitDoesIt) where
+module Rel.MeshRel.IHit.Hittable (hitDoesIt) where
 
 import qualified Data.Vector as V
-import Rel.MeshRel.IHit.Base (HitData (..), iHitData)
+import Rel.MeshRel.IHit.Base (HitData (..), Hittable (..), iHitData)
 import Struct.Ray (Ray)
+import SceneDescriptor.Attribute.Mesh.Base (Mesh (..))
+import SceneDescriptor.Attribute.Base (Attribute (..))
 import Rel.MeshRel.Sphere.Hit
 import Rel.MeshRel.Box.Hit
 import Struct.Vector.Vec3
 
-import SceneDescriptor.Attribute.Mesh.Primitive.Sphere (Sphere)
+instance Hittable Mesh where
+	hit (SphereAttribute sphere) ray = hitSphere sphere ray
+	hit (BoxAttribute box) ray = hitBox box ray
 
-data Object = SphereObject Sphere | BoxObject Box
+hitObject :: Ray -> Attribute -> (HitData, Attribute)
+hitObject ray attribute = (hit (mesh attribute) ray, attribute)
 
-hitObject :: Ray -> Object -> HitData
-hitObject ray (SphereObject sphere) = hit sphere ray
-hitObject ray (BoxObject box) = hit box ray
-
-hitDoesIt :: Ray -> V.Vector Object -> HitData
+hitDoesIt :: Ray -> V.Vector Attribute -> HitData
 hitDoesIt ray world = V.foldl' closestHit notValidHit hits
   where
     hits = V.map (hitObject ray) world
 
-    closestHit acc h
+    closestHit acc (h, _)
       | t h == -1.0 = acc
       | t acc == -1.0 = h
       | t h < t acc = h
