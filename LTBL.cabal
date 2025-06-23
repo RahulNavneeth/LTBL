@@ -33,6 +33,7 @@ library
     Rel.MeshRel.Sphere.Hit
     -- # MaterialRel
     Rel.MaterialRel.Base
+    Rel.MaterialRel.Metal
     Rel.MaterialRel.Lambertian
     Rel.MaterialRel.Scatter
     
@@ -50,6 +51,8 @@ library
     SceneDescriptor.Attribute.Base
     SceneDescriptor.Attribute.Mesh.Base
     SceneDescriptor.Attribute.Material.Base
+    SceneDescriptor.Attribute.Mesh.Primitive.Box
+    SceneDescriptor.Attribute.Material.Metal
     SceneDescriptor.Attribute.Material.Lambertian
     SceneDescriptor.Attribute.Mesh.Primitive.Sphere
     

@@ -38,15 +38,19 @@ getIndex i j = i * width dimension + j
 world :: V.Vector Attribute
 world =
   V.fromList
-    [ Attribute 
+    [
+	  Attribute 
 		(SphereAttribute (isphere 100.0 (ivec3 0.0 (-100.5) (-1.0))))
-		(LambertianMaterial (ilambertian (ivec3 1.0 1.0 1.0))),
+		(LambertianMaterial (ilambertian (ivec3 0.8 0.8 0.0))),
       Attribute 
 	  	(SphereAttribute (isphere 0.5 (ivec3 0.0 0.0 (-1.0))))
-	  	(LambertianMaterial (ilambertian (ivec3 1.0 1.0 1.0))),
+	  	(LambertianMaterial (ilambertian (ivec3 0.8 0.3 0.3))),
       Attribute
-	  	(SphereAttribute (isphere 0.5 (ivec3 (-0.8) 0.0 (-1.4))))
-	  	(LambertianMaterial (ilambertian (ivec3 1.0 1.0 1.0)))
+	  	(SphereAttribute (isphere 0.5 (ivec3 1.0 0.0 (-1.0))))
+	  	(MetalMaterial (imetal (ivec3 0.8 0.6 0.2))),
+      Attribute
+	  	(SphereAttribute (isphere 0.5 (ivec3 (-1.0) 0.0 (-1.0))))
+	  	(MetalMaterial (imetal (ivec3 0.8 0.8 0.8)))
     ]
 
 writeAsPPM :: Scene -> IO ()
@@ -60,22 +64,23 @@ writeAsPPM scene = withFile outputPath WriteMode $ \handle -> do
 
 getScenePixel :: Ray -> Int -> Int -> Float -> Float -> Int -> IO Vec3
 getScenePixel ray i j u v depth = do
-  s <- randomInUnitSphere
+  let unit_direction = makeUnitVector $ direction ray
+      t' = 0.5 * (y unit_direction + 1.0)
+      sky = ivec3 1.0 1.0 1.0 *. (1 - t') + ivec3 0.5 0.7 1.0 *. t'
   if depth <= 0 then
-    return (ivec3 0.0 0.0 0.0)
-  else case hitDoesIt ray world of
-    Just (xs, attribute) -> do
-      let target = p xs + normal xs + s
-      color <- getScenePixel (iray (p xs) (target - p xs)) i j u v (depth - 1)
-      return (color *. 0.5)
+    return sky
+  else do
+    case hitDoesIt ray world of
+      Just (xs, attribute) -> do
+        (scatteredRay, attenuation) <- scatter (material attribute) ray xs
+        color <- getScenePixel scatteredRay i j u v (depth - 1)
+        return (color * attenuation)
 
-    Nothing -> do
-      let unit_direction = makeUnitVector $ direction ray
-          t' = 0.5 * (y unit_direction + 1.0)
-          sky = ivec3 1.0 1.0 1.0 *. (1 - t') + ivec3 0.5 0.7 1.0 *. t'
-      if even (i + j)
-        then return (ivec3 0.0 0.0 1.0)
-        else return sky
+      Nothing -> do
+        -- if even (i + j)
+        --   then return (ivec3 0.0 0.0 1.0)
+        -- else return sky
+        return sky
 
 
 initScene :: IO Scene
