@@ -38,9 +38,15 @@ getIndex i j = i * width dimension + j
 world :: V.Vector Attribute
 world =
   V.fromList
-    [ Attribute (SphereAttribute $ Sphere 100.0 (ivec3 0.0 (-100.5) (-1.0))) Diffuse,
-      Attribute (SphereAttribute $ Sphere 0.5 (ivec3 0.0 0.0 (-1.0))) Diffuse,
-      Attribute (SphereAttribute $ Sphere 0.5 (ivec3 (-0.8) 0.0 (-1.4))) Diffuse
+    [ Attribute 
+		(SphereAttribute (isphere 100.0 (ivec3 0.0 (-100.5) (-1.0))))
+		(LambertianMaterial (ilambertian (ivec3 1.0 1.0 1.0))),
+      Attribute 
+	  	(SphereAttribute (isphere 0.5 (ivec3 0.0 0.0 (-1.0))))
+	  	(LambertianMaterial (ilambertian (ivec3 1.0 1.0 1.0))),
+      Attribute
+	  	(SphereAttribute (isphere 0.5 (ivec3 (-0.8) 0.0 (-1.4))))
+	  	(LambertianMaterial (ilambertian (ivec3 1.0 1.0 1.0)))
     ]
 
 writeAsPPM :: Scene -> IO ()
@@ -54,21 +60,23 @@ writeAsPPM scene = withFile outputPath WriteMode $ \handle -> do
 
 getScenePixel :: Ray -> Int -> Int -> Float -> Float -> Int -> IO Vec3
 getScenePixel ray i j u v depth = do
-  let (xs, attribute) = hitDoesIt ray world
-  	  s <- (material attribute)
-      target = p xs + normal xs + s
-      unit_direction = makeUnitVector $ direction ray
-      t' = 0.5 * (y unit_direction + 1.0)
-      sky = ivec3 1.0 1.0 1.0 *. (1 - t') + ivec3 0.5 0.7 1.0 *. t'
-      -- lerp1 = (ivec3 0.0 0.0 0.0 *. u) + (ivec3 1.0 0.0 1.0 *. (1.0 - u))
-      -- lerp2 = (ivec3 0.0 0.0 1.0 *. u) + (ivec3 0.0 1.0 0.0 *. (1.0 - u))
-      -- smoothStep = (lerp1 *. v) + (lerp2 *. (1.0 - v))
+  s <- randomInUnitSphere
+  if depth <= 0 then
+    return (ivec3 0.0 0.0 0.0)
+  else case hitDoesIt ray world of
+    Just (xs, attribute) -> do
+      let target = p xs + normal xs + s
+      color <- getScenePixel (iray (p xs) (target - p xs)) i j u v (depth - 1)
+      return (color *. 0.5)
 
-  if t xs > 0.0 && depth > 0 then do
-    color <- getScenePixel (iray (p xs) (target - p xs)) i j u v (depth - 1)
-    return (color *. 0.5)
-  -- else if even (i + j) then return (ivec3 0.0 0.0 1.0)
-  else return sky
+    Nothing -> do
+      let unit_direction = makeUnitVector $ direction ray
+          t' = 0.5 * (y unit_direction + 1.0)
+          sky = ivec3 1.0 1.0 1.0 *. (1 - t') + ivec3 0.5 0.7 1.0 *. t'
+      if even (i + j)
+        then return (ivec3 0.0 0.0 1.0)
+        else return sky
+
 
 initScene :: IO Scene
 initScene = do

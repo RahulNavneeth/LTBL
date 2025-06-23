@@ -1,8 +1,10 @@
-module SceneDescriptor.Attribute.Material.Lambertian (Lambertian (..), iLambertian) where
+module SceneDescriptor.Attribute.Material.Lambertian (Lambertian (..), ilambertian) where
 
-import SceneDescriptor.Attribute.Material.Base (Material (..))
+import Struct.Vector.Vec3
 
-data Lambertian = Lambertian Material
+data Lambertian = Lambertian {
+	albedo :: Vec3
+} deriving Show
 
-iLambertian :: Lambertian
-iLambertian albedo = Lambertian $ Material albedo
+ilambertian :: Vec3 -> Lambertian
+ilambertian = Lambertian

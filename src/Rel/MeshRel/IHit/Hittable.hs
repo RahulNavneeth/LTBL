@@ -8,6 +8,7 @@ import SceneDescriptor.Attribute.Base (Attribute (..))
 import Rel.MeshRel.Sphere.Hit
 import Rel.MeshRel.Box.Hit
 import Struct.Vector.Vec3
+import Data.Maybe
 
 instance Hittable Mesh where
 	hit (SphereAttribute sphere) ray = hitSphere sphere ray
@@ -16,15 +17,17 @@ instance Hittable Mesh where
 hitObject :: Ray -> Attribute -> (HitData, Attribute)
 hitObject ray attribute = (hit (mesh attribute) ray, attribute)
 
-hitDoesIt :: Ray -> V.Vector Attribute -> HitData
+hitDoesIt :: Ray -> V.Vector Attribute -> Maybe (HitData, Attribute)
 hitDoesIt ray world = V.foldl' closestHit notValidHit hits
   where
     hits = V.map (hitObject ray) world
 
-    closestHit acc (h, _)
-      | t h == -1.0 = acc
-      | t acc == -1.0 = h
-      | t h < t acc = h
-      | otherwise = acc
+    closestHit Nothing (h, material)
+      | t h == -1.0 = Nothing
+      | otherwise = Just (h, material)
+    closestHit (Just (acc, mat)) (h, material)
+      | t h == -1.0 = Just (acc, mat)
+      | t h < t acc = Just (h, material)
+      | otherwise = Just (acc, mat)
 
-    notValidHit = iHitData (-1.0) (ivec3 0.0 0.0 0.0) (ivec3 0.0 0.0 0.0)
+    notValidHit = Nothing

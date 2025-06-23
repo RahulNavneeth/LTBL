@@ -5,8 +5,9 @@ import Struct.Vector.Vec3 (ivec3)
 import Struct.Ray (iray)
 import Rel.MeshRel.IHit.Base (HitData (..))
 import SceneDescriptor.Attribute.Material.Base (Material (..), Scatter, Attenuation)
+import SceneDescriptor.Attribute.Material.Lambertian (Lambertian (..))
 
-lambertianScatter :: Material -> HitData -> IO (Scatter, Attenuation)
+lambertianScatter :: Lambertian -> HitData -> IO (Scatter, Attenuation)
 lambertianScatter material hitData = do
 	ran <- randomInUnitSphere
 	let target = (p hitData) + (normal hitData)
