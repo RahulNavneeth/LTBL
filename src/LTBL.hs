@@ -15,6 +15,7 @@ module LTBL (
 	module SceneDescriptor.Attribute.Material.Base,
 	module SceneDescriptor.Attribute.Material.Lambertian,
 	module SceneDescriptor.Attribute.Material.Metal,
+	module SceneDescriptor.Attribute.Material.Dielectric,
 	module SceneDescriptor.Attribute.Camera.Base,
 	module SceneDescriptor.Attribute.Mesh.Primitive.Box,
 	module SceneDescriptor.Attribute.Mesh.Primitive.Sphere,
@@ -47,6 +48,7 @@ import SceneDescriptor.Attribute.Mesh.Base
 import SceneDescriptor.Attribute.Material.Base
 import SceneDescriptor.Attribute.Mesh.Primitive.Box
 import SceneDescriptor.Attribute.Material.Metal
+import SceneDescriptor.Attribute.Material.Dielectric
 import SceneDescriptor.Attribute.Material.Lambertian
 import SceneDescriptor.Attribute.Mesh.Primitive.Sphere
 
