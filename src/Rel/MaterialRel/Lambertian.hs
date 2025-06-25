@@ -4,11 +4,12 @@ import Cbits.Interface.DRand (randomInUnitSphere)
 import Struct.Vector.Vec3 (ivec3)
 import Struct.Ray
 import Rel.MeshRel.IHit.Base (HitData (..))
-import SceneDescriptor.Attribute.Material.Base (Material (..), Scatter, Attenuation)
+import Rel.MaterialRel.Base (ScatterData (..))
 import SceneDescriptor.Attribute.Material.Lambertian (Lambertian (..))
 
-lambertianScatter :: Lambertian -> Ray -> HitData -> IO (Scatter, Attenuation)
+lambertianScatter :: Lambertian -> Ray -> HitData -> IO (ScatterData)
 lambertianScatter material _ hitData = do
-	ran <- randomInUnitSphere
-	let target = (p hitData) + (normal hitData) + ran
-	return (iray (p hitData) (target - p hitData), albedo material)
+  ran <- randomInUnitSphere
+  let target = (p hitData) + (normal hitData) + ran
+      scatter = iray (p hitData) (target - p hitData)
+  return $ ScatterData True scatter (albedo material)

@@ -1,4 +1,5 @@
 {-# LANGUAGE BangPatterns #-}
+{-# LANGUAGE BlockArguments #-}
 
 import qualified Data.Vector as V
 import qualified Data.Vector.Unboxed as VU
@@ -26,6 +27,9 @@ sceneHeight = 100
 sceneSamples :: Pixel
 sceneSamples = 100
 
+totalDepth :: Int
+totalDepth = 50
+
 dimension :: Dimension
 dimension = Dimension sceneWidth sceneHeight sceneSamples
 
@@ -47,10 +51,10 @@ world =
 	  	(LambertianMaterial (ilambertian (ivec3 0.8 0.3 0.3))),
       Attribute
 	  	(SphereAttribute (isphere 0.5 (ivec3 1.0 0.0 (-1.0))))
-	  	(MetalMaterial (imetal (ivec3 0.8 0.6 0.2))),
+	  	(MetalMaterial (imetal (ivec3 0.8 0.6 0.2) 1.0)),
       Attribute
 	  	(SphereAttribute (isphere 0.5 (ivec3 (-1.0) 0.0 (-1.0))))
-	  	(MetalMaterial (imetal (ivec3 0.8 0.8 0.8)))
+	  	(MetalMaterial (imetal (ivec3 0.8 0.8 0.8) 0.3))
     ]
 
 writeAsPPM :: Scene -> IO ()
@@ -72,10 +76,12 @@ getScenePixel ray i j u v depth = do
   else do
     case hitDoesIt ray world of
       Just (xs, attribute) -> do
-        (scatteredRay, attenuation) <- scatter (material attribute) ray xs
-        color <- getScenePixel scatteredRay i j u v (depth - 1)
-        return (color * attenuation)
-
+        scatterData <- scatter (material attribute) ray xs
+        if validScatter scatterData
+          then do
+            color <- getScenePixel (scatteredRay scatterData) i j u v (depth - 1)
+            return (color * (attenuation scatterData))
+          else return $ ivec3 0.0 0.0 0.0
       Nothing -> do
         -- if even (i + j)
         --   then return (ivec3 0.0 0.0 1.0)
@@ -94,9 +100,9 @@ initScene = do
     value :: Int -> Int -> IO RGB
     value i j = do
       col <- go 0 0
-      let ir = floor $ 255.9 * x col
-          ig = floor $ 255.9 * y col
-          ib = floor $ 255.9 * z col
+      let ir = floor $ 255.9 * sqrt (x col)
+          ig = floor $ 255.9 * sqrt (y col)
+          ib = floor $ 255.9 * sqrt (z col)
 
       return $ RGB (ir, ig, ib)
       where
@@ -113,7 +119,7 @@ initScene = do
                     vertical = ivec3 0.0 2.0 0.0
                     cam = icam origin lower_left_corner horizontal vertical
                     r = getRay cam u v
-                c <- getScenePixel r i j u v 50
+                c <- getScenePixel r i j u v totalDepth
                 go (acc + c) (s + 1)
 
 main :: IO ()
