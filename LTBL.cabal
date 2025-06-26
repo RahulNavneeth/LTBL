@@ -36,11 +36,15 @@ library
     Rel.MaterialRel.Metal
     Rel.MaterialRel.Lambertian
     Rel.MaterialRel.Scatter
+    Rel.MaterialRel.Dielectric
     
     -- Struct
     -- # Vector
     Struct.Vector.Vec3
     Struct.Ray
+
+    -- Utils
+    Utils.Ray
     
     -- Scene descriptor
     -- # Parser

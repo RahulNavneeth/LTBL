@@ -3,7 +3,7 @@
 
 import qualified Data.Vector as V
 import qualified Data.Vector.Unboxed as VU
-import LTBL
+import LTBL 
 import System.IO
 
 type Pixel = Int
@@ -54,7 +54,7 @@ world =
 	  	(MetalMaterial (imetal (ivec3 0.8 0.6 0.2) 1.0)),
       Attribute
 	  	(SphereAttribute (isphere 0.5 (ivec3 (-1.0) 0.0 (-1.0))))
-	  	(MetalMaterial (imetal (ivec3 0.8 0.8 0.8) 0.3))
+	  	(DielectricMaterial (idielectric 1.5))
     ]
 
 writeAsPPM :: Scene -> IO ()

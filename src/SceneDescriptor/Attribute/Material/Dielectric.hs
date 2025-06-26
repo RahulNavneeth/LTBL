@@ -1,11 +1,14 @@
 module SceneDescriptor.Attribute.Material.Dielectric (
 	Dielectric (..),
 	idielectric,
-	idielectricDefault
+	idielectricDefault,
+	RefractiveIndex
 ) where
 
+type RefractiveIndex = Float
+
 data Dielectric =  Dielectric {
-	refractiveIndex :: Float
+	refractiveIndex :: RefractiveIndex
 } deriving Show
 
 idielectric :: Float -> Dielectric

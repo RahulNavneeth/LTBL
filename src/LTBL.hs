@@ -7,8 +7,10 @@ module LTBL (
 	module Rel.MaterialRel.Scatter,
 	module Rel.MaterialRel.Lambertian,
 	module Rel.MaterialRel.Metal,
+	module Rel.MaterialRel.Dielectric,
 	module Struct.Vector.Vec3,
 	module Struct.Ray,
+	module Utils.Ray,
 	module SceneDescriptor.Parser,
 	module SceneDescriptor.Attribute.Base,
 	module SceneDescriptor.Attribute.Mesh.Base,
@@ -31,11 +33,15 @@ import Rel.MaterialRel.Base
 import Rel.MaterialRel.Scatter
 import Rel.MaterialRel.Metal
 import Rel.MaterialRel.Lambertian
+import Rel.MaterialRel.Dielectric
 
 -- Struct
 -- # Vector
 import Struct.Vector.Vec3
 import Struct.Ray
+
+-- Utils
+import Utils.Ray
 
 -- Scene descriptor
 -- # Parser
