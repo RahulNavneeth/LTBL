@@ -7,9 +7,6 @@ import LTBL
 import System.IO
 
 type Pixel = Int
-
-newtype RGB = RGB (Int, Int, Int) deriving (Show)
-
 type Scene = [RGB]
 
 data Dimension = Dimension {
@@ -45,29 +42,36 @@ world =
     [
 	  Attribute 
 		(SphereAttribute (isphere 100.0 (ivec3 0.0 (-100.5) (-1.0))))
-		(LambertianMaterial (ilambertian (ivec3 0.8 0.8 0.0))),
+		(LambertianMaterial (ilambertian (ivec3 0.8 0.8 0.0)))
+		(RGB (ivec3 0.26 0.54 0.355)),
       Attribute 
 	  	(SphereAttribute (isphere 0.5 (ivec3 0.0 0.0 (-1.0))))
-	  	(LambertianMaterial (ilambertian (ivec3 0.1 0.2 0.5))),
+	  	(LambertianMaterial (ilambertian (ivec3 0.1 0.2 0.5)))
+		(RGB (ivec3 0.03 0.0 1)),
       Attribute
 	  	(SphereAttribute (isphere 0.5 (ivec3 1.0 0.0 (-1.0))))
-	  	(MetalMaterial (imetal (ivec3 0.8 0.6 0.2) 0.2)),
+	  	(MetalMaterial (imetal (ivec3 0.8 0.6 0.2) 0.2))
+		(RGB (ivec3 0.85 1.0 0.36)),
       Attribute
 	  	(SphereAttribute (isphere 0.5 (ivec3 (-1.0) 0.0 (-1.0))))
-	  	(DielectricMaterial (idielectric 1.5)),
+	  	(DielectricMaterial (idielectric 1.5))
+		(RGB (ivec3 1.0 0.83 0.96)),
       Attribute
 	  	(SphereAttribute (isphere (-0.45) (ivec3 (-1.0) 0.0 (-1.0))))
 	  	(DielectricMaterial (idielectric 1.5))
+		(RGB (ivec3 1.0 0.83 0.96))
     ]
 
 writeAsPPM :: Scene -> IO ()
-writeAsPPM scene = withFile outputPath WriteMode $ \handle -> do
+writeAsPPM scene = withFile "scene.ppm" WriteMode $ \handle -> do
   hPutStrLn handle "P3"
-  hPutStrLn handle (unwords [show $ width dimension, show $ height dimension])
+  hPutStrLn handle (unwords [show (width dimension), show (height dimension)])
   hPutStrLn handle "255"
   mapM_ (hPutStrLn handle . value) scene
   where
-    value (RGB (r, g, b)) = unwords (map show [r, g, b])
+    value (RGB v) = unwords $ map (show . toInt) [r v, g v, b v]
+    toInt x = floor (clamp x)
+    clamp x = max 0 (min 255 x)
 
 getScenePixel :: Ray -> Int -> Int -> Float -> Float -> Int -> IO Vec3
 getScenePixel ray i j u v depth = do
@@ -83,7 +87,8 @@ getScenePixel ray i j u v depth = do
         if validScatter scatterData
           then do
             color <- getScenePixel (scatteredRay scatterData) i j u v (depth - 1)
-            return (color * (attenuation scatterData))
+            return (color * (getRGB (diffuseColor attribute)))
+            -- return (color * (attenuation scatterData))
           else return $ ivec3 0.0 0.0 0.0
       Nothing -> do
         -- if even (i + j)
@@ -103,11 +108,11 @@ initScene = do
     value :: Int -> Int -> IO RGB
     value i j = do
       col <- go 0 0
-      let ir = floor $ 255.9 * sqrt (x col)
-          ig = floor $ 255.9 * sqrt (y col)
-          ib = floor $ 255.9 * sqrt (z col)
-
-      return $ RGB (ir, ig, ib)
+      let r' = 255.9 * sqrt (x col)
+          g' = 255.9 * sqrt (y col)
+          b' = 255.9 * sqrt (z col)
+      
+      return $ RGB (ivec3 r' g' b')
       where
           go acc s
             | s == samples dimension = return (acc /. fromIntegral s)
