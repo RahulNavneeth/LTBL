@@ -48,12 +48,15 @@ world =
 		(LambertianMaterial (ilambertian (ivec3 0.8 0.8 0.0))),
       Attribute 
 	  	(SphereAttribute (isphere 0.5 (ivec3 0.0 0.0 (-1.0))))
-	  	(LambertianMaterial (ilambertian (ivec3 0.8 0.3 0.3))),
+	  	(LambertianMaterial (ilambertian (ivec3 0.1 0.2 0.5))),
       Attribute
 	  	(SphereAttribute (isphere 0.5 (ivec3 1.0 0.0 (-1.0))))
-	  	(MetalMaterial (imetal (ivec3 0.8 0.6 0.2) 1.0)),
+	  	(MetalMaterial (imetal (ivec3 0.8 0.6 0.2) 0.2)),
       Attribute
 	  	(SphereAttribute (isphere 0.5 (ivec3 (-1.0) 0.0 (-1.0))))
+	  	(DielectricMaterial (idielectric 1.5)),
+      Attribute
+	  	(SphereAttribute (isphere (-0.45) (ivec3 (-1.0) 0.0 (-1.0))))
 	  	(DielectricMaterial (idielectric 1.5))
     ]
 

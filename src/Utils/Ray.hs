@@ -1,6 +1,7 @@
 module Utils.Ray (
 	reflect,
-	refract
+	refract,
+	schlick
 ) where
 
 import Data.Maybe
@@ -20,3 +21,9 @@ refract v n niOvernt
 		discriminant = 1.0 - (niOvernt*niOvernt) * (1.0 - (dt*dt)) :: Float
 
 		refracted = ((uv - (n *. dt)) *. niOvernt) - (n *. sqrt discriminant) :: Vec3
+	
+schlick :: Float -> Float -> Float 
+schlick cosine refractiveIndex = r1 + (1.0-r1)*((1-cosine)**5)
+  where
+    r0 = (1-refractiveIndex)/(1+refractiveIndex)
+    r1 = r0*r0
